@@ -143,7 +143,7 @@
                 <form id="createUserForm" onsubmit="submitCreateForm(event)">
                     <div class="form-group">
                         <label for="verificationId">Verification ID (optional)</label>
-                        <input type="text" class="form-control" id="verificationId" placeholder="Enter verification ID">
+                        <input type="text" class="form-control" id="customVerificationId" placeholder="Enter verification ID">
                     </div>
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
@@ -241,7 +241,7 @@
             const accountId = document.getElementById('accountId').value;
             const password = document.getElementById('password').value;
             const ruleId = document.getElementById('ruleId').value;
-            const verificationId = document.getElementById('verificationId').value;
+            const customVerificationId = document.getElementById('customVerificationId').value;
 
             const soapRequest = `
                 <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:dyn="http://dynamicform.services.registrations.edentiti.com/">
@@ -250,7 +250,7 @@
                         <dyn:generateHostedInviteURLForOnboarding>
                             <accountId>${accountId}</accountId>
                             <password>${password}</password>
-                            <verificationId>${verificationId}</verificationId>
+                            <verificationId>${customVerificationId}</verificationId>
                             <ruleId>${ruleId}</ruleId>
                         </dyn:generateHostedInviteURLForOnboarding>
                     </soapenv:Body>
@@ -261,6 +261,7 @@
             xhr.open('POST', 'https://test-au.vixverify.com/Registrations-Registrations/GreenIDHostedAPIService', true);
             xhr.setRequestHeader('Content-Type', 'text/xml');
             xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
+            xhr.setRequestHeader('Access-Control-Allow-Headers', '*');
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4 && xhr.status === 200) {
                     const parser = new DOMParser();
