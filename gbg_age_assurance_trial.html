@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+        .sidebar {
+            position: fixed;
+            top: 66px; /* Adjusted height of the navbar */
+            left: 0;
+            width: 250px;
+            height: calc(100vh - 66px); /* Full height minus adjusted navbar height */
+            background-color: #4D4DFF;
+            /* padding-top: 20px; */
+            overflow-y: auto; /* Enable scrolling */
+        }
+        .sidebar a {
+            color: white;
+            padding: 20px;
+            text-decoration: none;
+            display: block;
+            border-bottom: solid 1.5px darkblue;
+            
+        }
+        .sidebar a:hover {
+            background-color: darkblue;
+        }
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            margin-top: 66px; /* Adjusted height of the navbar */
+        }
+        .navbar-brand img {
+            height: 40px;
+        }
+        .section-createnew-container {
+            display: none;
+        }
+        .form-container {
+            display: none;
+            margin-top: 20px;
+            max-width: 600px; /* Set a reasonable width */
+        }
+        .result-container {
+            display: none;
+            margin-top: 20px;
+            max-width: 600px; /* Set a reasonable width */
+        }
+        .server-info-block {
+            /* margin-top: 30px; */
+            /* font-weight: bold; */
+            background-color: darkblue;
+            padding: 7px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">
+            <img src="https://demo.cafs.gbgplc.com/assets/PNG/GBG-logo-2025-RGB_GBG-logo-primary.png" alt="Logo">
+        </a>
+    </nav>
+
+    <div class="sidebar">
+        
+        
+
+        <div class="server-info-block">
+            <div class="text-white px-3">greenID Connection</div><br>
+            <form id="serverInfoForm" class="px-3">
+                <div class="form-group">
+                    <label for="accountId" class="text-white">Account ID</label>
+                    <input type="text" class="form-control" id="accountId" placeholder="Enter account ID" value="" required>
+                </div>
+                <div class="form-group">
+                    <label for="password" class="text-white">Password</label>
+                    <input type="password" class="form-control" id="password" placeholder="Enter password" value="" required>
+                </div>
+                <div class="form-group">
+                    <!-- <label for="ruleId" class="text-white">Rule ID</label> -->
+                    <input type="hidden" class="form-control" id="ruleId" placeholder="Enter rule ID" value="default" required>
+                </div>
+            </form>
+        </div>
+
+        <a href="#" onclick="showForm('newverification')">Create New Verification</a>
+        <a href="#" onclick="showForm('registeruser')">Create New Verification(PII)</a>
+        <a href="#" onclick="showForm('checkstatus')">Check Verification Status</a>
+        <a href="#" onclick="showForm('getresult')">Get Verification Result</a>
+
+    </div>
+
+    <div class="main-content">
+
+        <div class="section-createpii-container" id="section-createpii-container">
+            <div class="form-container" id="registerForm">
+                <h3>Create New Verification (PII)</h3>
+                <form id="registerUserForm" onsubmit="submitForm(event)">
+                    <div class="form-group">
+                        <label for="verificationId">Verification ID</label>
+                        <input type="text" class="form-control" id="verificationId" placeholder="Enter verification ID" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="firstName">First Name</label>
+                        <input type="text" class="form-control" id="firstName" placeholder="Enter first name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="middleName">Middle Name</label>
+                        <input type="text" class="form-control" id="middleName" placeholder="Enter middle name">
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Last Name</label>
+                        <input type="text" class="form-control" id="lastName" placeholder="Enter last name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="dob">Date of Birth</label>
+                        <input type="date" class="form-control" id="dob" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+    
+            <div class="result-container" id="resultContainer">
+                <h3>Verification Result</h3>
+                <p><strong>Status:</strong> <span id="verificationStatus"></span></p>
+                <p><strong>Hosted Invite URL:</strong> <a href="#" id="hostedInviteUrl" target="_blank"></a></p>
+            </div>
+        </div>
+
+        <!-- Below form is to create a new verifiction using minimal or no personal information -->
+        <div id="section-createnew-container" class="section-createnew-container">
+            <div class="form-container" id="createForm">
+                <h3>Create New Verification</h3>
+                <form id="createUserForm" onsubmit="submitCreateForm(event)">
+                    <div class="form-group">
+                        <label for="verificationId">Verification ID (optional)</label>
+                        <input type="text" class="form-control" id="verificationId" placeholder="Enter verification ID">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+    
+            <div class="result-container" id="createResultContainer">
+                <h3>Verification Details</h3>
+                <p><strong>Verification ID:</strong> <span id="createVerificationId"></span></p>
+                <p><strong>Hosted Invite URL:</strong> <a href="#" id="createHostedInviteUrl" target="_blank"></a></p>
+            </div>
+        </div>
+
+
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function showForm(form_name) {
+            // Hide all forms and result containers
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('resultContainer').style.display = 'none';
+            document.getElementById('section-createnew-container').style.display = 'none';
+            // Show the selected form
+            if(form_name === 'registeruser') {
+                document.getElementById('registerForm').style.display = 'block';
+                document.getElementById('resultContainer').style.display = 'none';
+            } else if (form_name === 'newverification') {
+                document.getElementById('section-createnew-container').style.display = 'block';
+                document.getElementById('createForm').style.display = 'block';
+                document.getElementById('createResultContainer').style.display = 'none';
+            } else if (form_name === 'checkstatus') {
+                // Implement check status functionality
+            } else if (form_name === 'getresult') {
+                // Implement get result functionality
+            }
+        }
+
+        function submitForm(event) {
+            event.preventDefault();
+
+            const accountId = document.getElementById('accountId').value;
+            const password = document.getElementById('password').value;
+            const ruleId = document.getElementById('ruleId').value;
+            const verificationId = document.getElementById('verificationId').value;
+            const firstName = document.getElementById('firstName').value;
+            const middleName = document.getElementById('middleName').value;
+            const lastName = document.getElementById('lastName').value;
+            const dob = document.getElementById('dob').value;
+
+            // Convert date from yyyy-mm-dd to dd/mm/yyyy format
+            const [year, month, day] = dob.split('-');
+            const formattedDob = `${day}/${month}/${year}`;
+
+            const requestBody = {
+                verificationId: verificationId,
+                accountId: accountId,
+                password: password,
+                ruleId: ruleId,
+                givenNames: firstName,
+                middleNames: middleName,
+                surname: lastName,
+                dob: formattedDob
+            };
+
+            fetch('https://test-au.vixverify.com/df/registerVerificationAndGenerateHostedInviteURL', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.responseErrorFlag) {
+                    document.getElementById('verificationStatus').textContent = data.overallVerificationStatus;
+                    document.getElementById('hostedInviteUrl').textContent = data.hostedInviteUrl;
+                    document.getElementById('hostedInviteUrl').href = data.hostedInviteUrl;
+                    document.getElementById('registerForm').style.display = 'none';
+                    document.getElementById('resultContainer').style.display = 'block';
+                } else {
+                    console.error('Error:', data.responseErrorMessage);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function submitCreateForm(event) {
+            event.preventDefault();
+
+            const accountId = document.getElementById('accountId').value;
+            const password = document.getElementById('password').value;
+            const ruleId = document.getElementById('ruleId').value;
+            const verificationId = document.getElementById('verificationId').value;
+
+            const soapRequest = `
+                <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:dyn="http://dynamicform.services.registrations.edentiti.com/">
+                    <soapenv:Header/>
+                    <soapenv:Body>
+                        <dyn:generateHostedInviteURLForOnboarding>
+                            <accountId>${accountId}</accountId>
+                            <password>${password}</password>
+                            <verificationId>${verificationId}</verificationId>
+                            <ruleId>${ruleId}</ruleId>
+                        </dyn:generateHostedInviteURLForOnboarding>
+                    </soapenv:Body>
+                </soapenv:Envelope>
+            `;
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', 'https://test-au.vixverify.com/Registrations-Registrations/GreenIDHostedAPIService', true);
+            xhr.setRequestHeader('Content-Type', 'text/xml');
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    const parser = new DOMParser();
+                    const xmlDoc = parser.parseFromString(xhr.responseText, 'text/xml');
+                    const responseErrorFlag = xmlDoc.getElementsByTagName('responseErrorFlag')[0].textContent;
+                    if (responseErrorFlag === 'false') {
+                        const hostedInviteUrl = xmlDoc.getElementsByTagName('hostedInviteUrl')[0].textContent;
+                        const verificationId = xmlDoc.getElementsByTagName('verificationId')[0].textContent;
+                        console.log('Hosted Invite URL:', hostedInviteUrl);
+                        console.log('Verification ID:', verificationId);
+                        
+                        document.getElementById('createVerificationId').textContent = verificationId;
+                        document.getElementById('createHostedInviteUrl').textContent = hostedInviteUrl;
+                        document.getElementById('createHostedInviteUrl').href = hostedInviteUrl;
+
+                        document.getElementById('section-createnew-container').style.display = 'block';
+                        document.getElementById('createForm').style.display = 'none';
+                        document.getElementById('createResultContainer').style.display = 'block';
+
+                    } else {
+                        const responseErrorMessage = xmlDoc.getElementsByTagName('responseErrorMessage')[0].textContent;
+                        console.error('Error:', responseErrorMessage);
+                    }
+                } else if (xhr.readyState === 4) {
+                    console.error('Error:', xhr.statusText);
+                }
+            };
+            xhr.send(soapRequest);
+
+
+        }
+
+    </script>
+</body>
+</html>
