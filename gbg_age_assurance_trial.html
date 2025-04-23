@@ -260,6 +260,7 @@
             const xhr = new XMLHttpRequest();
             xhr.open('POST', 'https://test-au.vixverify.com/Registrations-Registrations/GreenIDHostedAPIService', true);
             xhr.setRequestHeader('Content-Type', 'text/xml');
+            xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4 && xhr.status === 200) {
                     const parser = new DOMParser();
